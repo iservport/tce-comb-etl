@@ -42,7 +42,7 @@ object Application extends App {
 
   IbgeService.run
 
-  // prepara o abiente, totalizando vlaores de gastos
+  // prepara o abiente, totalizando valores de gastos
 
   SetupService.run
 

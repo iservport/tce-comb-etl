@@ -7,7 +7,7 @@ O program executa em três etapas:
   
   * lê dados do IBGE,
   
-  * prepara o abiente, totalizando vlaores de gastos.
+  * prepara o abiente, totalizando valores de gastos.
   
 Os dados são lidos a partir do conjunto de arquivos xml fornecidos periodicamente
 pelo TCE/PR.
