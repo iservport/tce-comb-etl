@@ -16,9 +16,8 @@ class AdapterActor extends Actor with ActorLogging {
       collectionActor ! Vehicle(attributes)
       collectionActor ! Usage(attributes)
     case ("QuantitativaCombustivel", attributes: Map[String, String]) =>
-      println("!!")
-//      collectionActor ! Quantity(attributes)
-    case ("VeiculoEquipamento", attributes: Map[String, String]) =>
+      collectionActor ! Quantity(attributes)
+//    case ("VeiculoEquipamento", attributes: Map[String, String]) =>
 //      collectionActor ! VehicleData(attributes)
     case other => println(other)
   }

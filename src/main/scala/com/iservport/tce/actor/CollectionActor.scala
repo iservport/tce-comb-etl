@@ -14,16 +14,7 @@ class CollectionActor extends Actor with ActorLogging {
 
   implicit val executor = context.dispatcher
 
-//  val config = ConfigFactory.load()
-//  val database = config.getString("mongodb.database") // TODO not used
-
-  val driver = new MongoDriver
-  implicit val connection: MongoConnection = driver.connection("localhost:27017").get
-
-  def fromConnection(collection: String)(implicit connection: MongoConnection): Future[BSONCollection] =
-    connection.database("InovaTCE").map(_.collection(collection))
-
-//  val db = connection(database)
+  import com.iservport.tce.ApplicationConfig._
 
   val cityColl    = fromConnection("cityData")
   val entityColl  = fromConnection("entityData")

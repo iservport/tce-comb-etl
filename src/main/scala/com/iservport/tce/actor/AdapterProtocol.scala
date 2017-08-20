@@ -33,8 +33,10 @@ case class Vehicle(attributes: Map[String, String]) extends AdapterProtocol {
   val id = attributes.getOrElse("idVeiculoEquipamento", "")
   val doc = BSONDocument(
     "_id" -> s"$id"
-    ,"cdIBGE" -> s"${attributes.getOrElse("cdIBGE", "SemIBGE")}"
-    ,"idEntidade" -> s"${attributes.getOrElse("idEntidade", "")}"
+    ,"cdIBGE" -> s"${attributes.getOrElse("cdIBGE", "SemCdIBGE")}"
+    ,"nmMunicipio" -> s"${attributes.getOrElse("nmMunicipio", "SemNmMunicipio")}"
+    ,"idEntidade" -> s"${attributes.getOrElse("idEntidade", "SemIdEntidade")}"
+    ,"nmEntidade" -> s"${attributes.getOrElse("nmEntidade", "SemNmEntidade")}"
     ,"cdBem" -> s"${attributes.getOrElse("cdBem", "")}"
     ,"dsTipoPropriedadeBem" -> s"${attributes.getOrElse("dsTipoPropriedadeBem", "")}"
     ,"nrPlaca" -> s"${attributes.getOrElse("nrPlaca", "SEM PLAC")}"
@@ -44,30 +46,42 @@ case class Vehicle(attributes: Map[String, String]) extends AdapterProtocol {
   )
 }
 case class Usage(attributes: Map[String, String]) extends AdapterProtocol {
-  val id = s"${attributes.getOrElse("idVeiculoEquipamento", "")}:${attributes.getOrElse("DataReferencia", "")}"
+  val ano = s"${attributes.getOrElse("nrAno", "SemNrAno")}"
+  val mes = s"${attributes.getOrElse("nrMes", "SemNrMes")}"
+  val id = s"${attributes.getOrElse("idVeiculoEquipamento", "")}:$ano:$mes"
   val doc = BSONDocument(
-      "_id" -> s"$id"
-    ,"year" -> s"${attributes.getOrElse("ultimoEnvioSIMAMNesteExercicio", "YYYY").split("/").head}"
-    ,"cdIBGE" -> s"${attributes.getOrElse("cdIBGE", "SemIBGE")}"
-    ,"idEntidade" -> s"${attributes.getOrElse("idEntidade", "")}"
+      "_id" -> id
+    ,"cdIBGE" -> s"${attributes.getOrElse("cdIBGE", "SemCdIBGE")}"
+    ,"nmMunicipio" -> s"${attributes.getOrElse("nmMunicipio", "SemNmMunicipio")}"
+    ,"idEntidade" -> s"${attributes.getOrElse("idEntidade", "SemIdEntidade")}"
+    ,"nmEntidade" -> s"${attributes.getOrElse("nmEntidade", "SemNmEntidade")}"
+    ,"nrAno" -> ano
+    ,"nrMes" -> mes
     ,"idVeiculoEquipamento" -> s"${attributes.getOrElse("idVeiculoEquipamento", "")}"
     ,"dsTiposObjetoDespesa" -> s"${attributes.getOrElse("dsTiposObjetoDespesa", "Vazio")}"
     ,"vlConsumo" -> attributes.getOrElse("vlConsumo", "0").toDouble
     ,"idTipoMedidor" -> s"${attributes.getOrElse("idTipoMedidor", "SemMedidor")}"
+    ,"ultimoEnvioSIMAMNesteExercicio" -> s"${attributes.getOrElse("ultimoEnvioSIMAMNesteExercicio", "YYYY")}"
   )
 }
 case class Quantity(attributes: Map[String, String]) extends AdapterProtocol {
-  val id = s"${attributes.getOrElse("idEntidade", "SemEntidade")}:${attributes.getOrElse("dtLiquidacao", "0").stripSuffix("T00:00:00")}"
-  val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+  val dtLiquidacao = s"${attributes.getOrElse("dtLiquidacao", "0").stripSuffix("T00:00:00")}"
+  val dsTipoObjetoDespesa = s"${attributes.getOrElse("dsTipoObjetoDespesa", "")}"
+  val id = s"${attributes.getOrElse("idEntidade", "SemEntidade")}:$dtLiquidacao:$dsTipoObjetoDespesa"
+  val vlLiquidacao = attributes.getOrElse("vlLiquidacao", "0").toDouble
+  val nrQuantidadeConsolidadaLiquidacao = attributes.getOrElse("nrQuantidadeConsolidadaLiquidacao", "1").toDouble
+  val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
   def toMonth(date: String) = f"${LocalDate.parse(date, formatter).getMonthValue}%02d"
   val doc = BSONDocument(
     "_id" -> s"$id"
-    ,"cityId" -> s"${attributes.getOrElse("cdIBGE", "")}"
-    ,"entityId" -> s"${attributes.getOrElse("idEntidade", "")}"
-    ,"year" -> s"${attributes.getOrElse("nrAnoLiquidacao", "")}"
-    ,"month" -> s"${toMonth(attributes.getOrElse("dtLiquidacao", ""))}"
-    ,"subject" -> s"${attributes.getOrElse("dsTipoObjetoDespesa", "")}:${attributes.getOrElse("dsUnidadeMedida", "")}"
-    ,"averagePrice" -> attributes.getOrElse("vlLiquidacao", "0").toDouble / attributes.getOrElse("nrQuantidadeConsolidadaLiquidacao", "1").toDouble
+    ,"idEntidade" -> s"${attributes.getOrElse("idEntidade", "SemIdEntidade")}"
+    ,"nrAnoLiquidacao" -> s"${attributes.getOrElse("nrAnoLiquidacao", "")}"
+    ,"nrMesLiquidacao" -> s"${toMonth(dtLiquidacao)}"
+    ,"dtLiquidacao" -> dtLiquidacao
+    ,"dsTipoObjetoDespesa" -> dsTipoObjetoDespesa
+    ,"vlLiquidacao" -> vlLiquidacao
+    ,"nrQuantidadeConsolidadaLiquidacao" -> nrQuantidadeConsolidadaLiquidacao
+    ,"vlUnitarioLiquidacao" -> vlLiquidacao / nrQuantidadeConsolidadaLiquidacao
   )
 }
 

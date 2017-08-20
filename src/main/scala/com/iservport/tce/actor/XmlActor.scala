@@ -28,6 +28,6 @@ class XmlActor extends Actor with ActorLogging {
   val parse = Flow[String].map(ByteString(_)).via(XmlParsing.parser).toMat(Sink.seq)(Keep.right)
 
   def valid(elementName: String) =
-    Array("Combustivel", "QuantitativaCombustivel", "VeiculoEquipamento").contains(elementName)
+    Array("Combustivel", "QuantitativaCombustivel").contains(elementName)
 
 }

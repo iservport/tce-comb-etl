@@ -25,16 +25,25 @@ object Application extends App {
 
   lazy val fileActor = system.actorOf(Props(new XmlActor) , "_xml")
 
-  val files = {
-    session.sparkContext.binaryFiles("/Users/mauriciofernandesdecastro/Desktop/2016/*Combustivel.zip")
-      .flatMap { case (zipFilePath, zipContent) =>
-        val zipInputStream = new ZipInputStream(zipContent.open())
-        Stream.continually(zipInputStream.getNextEntry)
-          .takeWhile(_ != null)
-          .map { _ =>
-            scala.io.Source.fromInputStream(zipInputStream, "UTF-16").getLines.mkString("\n")
-          }
-      }.take(10).foreach(fileActor ! _)
-  }
+  // utiliza Apache Spark e Akka para descompactar, ler os arquivos selecionados e persistir.
+
+  session.sparkContext.binaryFiles("/Users/mauriciofernandesdecastro/Desktop/2016/*Combustivel.zip")
+    .flatMap { case (zipFilePath, zipContent) =>
+      val zipInputStream = new ZipInputStream(zipContent.open())
+      Stream.continually(zipInputStream.getNextEntry)
+        .takeWhile(_ != null)
+        .map { _ =>
+          scala.io.Source.fromInputStream(zipInputStream, "UTF-16").getLines.mkString("\n")
+        }
+    }
+    .foreach(fileActor ! _)
+
+  // lê dados do IBGE
+
+  IbgeService.run
+
+  // prepara o abiente, totalizando vlaores de gastos
+
+  SetupService.run
 
 }
