@@ -1,8 +1,8 @@
 package com.iservport.tce
 
-import org.apache.spark.sql.SparkSession
 import com.mongodb.spark.MongoSpark
-import com.mongodb.spark.config.{ReadConfig, WriteConfig}
+import com.mongodb.spark.config.WriteConfig
+import org.apache.spark.sql.SparkSession
 
 /**
   * Serviço de ajuste incial dos dados.
@@ -20,38 +20,36 @@ object SetupService {
 
     // cache dos dataframes
 
-    val usage    = toDataFrame("usage")
+    val price    = toDataFrame("price")
     val quantity = toDataFrame("quantity")
-    val ibge = toDataFrame("ibge").select($"cdIBGE", $"populacao", $"area")
+    val ibge     = toDataFrame("ibge").select($"cdIBGE", $"populacao", $"area")
 
     // início das agregações
 
     import org.apache.spark.sql.functions._
 
-    val us = usage
-      .groupBy($"nrAno", $"nrMes", $"idEntidade", $"dsTiposObjetoDespesa")
-      .agg(
-          first("cdIBGE") as "cdIBGE"
-        , first("nmMunicipio") as "nmMunicipio"
-        , first("nmEntidade") as "nmEntidade"
-        , sum("vlConsumo") as "vlMensalConsumo"
-      )
-      .persist
-    val qs = quantity
+    val pr = price
       .groupBy($"nrAnoLiquidacao", $"nrMesLiquidacao", $"idEntidade", $"dsTipoObjetoDespesa")
       .agg(avg("vlUnitarioLiquidacao") as "vlMedioLiquidacao")
       .persist
-
-    // facilita a leitura por nomes de colunas sem ambiguidades
-
-    val idEntidade = us.col("idEntidade")
-    val dsTiposObjetoDespesa = us.col("dsTiposObjetoDespesa")
+    val qs = quantity
+      .groupBy($"nrAnoConsumo", $"nrMesConsumo", $"idEntidade", $"dsTipoObjetoDespesaNrSeq")
+      .agg(
+        first("cdIBGE") as "cdIBGE"
+        , sum("nrQuantidadeConsumoVeiculoEqNrSeq") as "nrQuantidadeConsumoVeiculoMensal"
+      ).filter($"nrQuantidadeConsumoVeiculoMensal" > 0)
+      .persist
 
     // cria um novo dataframe com a combinação dos anteriores
 
-    val expenditure = us
-      .join(qs, qs.col("nrAnoLiquidacao") === $"nrAno" && qs.col("nrMesLiquidacao") === $"nrMes" && qs.col("idEntidade") === idEntidade && qs.col("dsTipoObjetoDespesa").startsWith(dsTiposObjetoDespesa))
-      .withColumn("vlMensalDespesa", $"vlMedioLiquidacao" * $"vlMensalConsumo")
+    val expenditure = qs
+      .join(pr,
+          $"nrAnoLiquidacao"     === $"nrAnoConsumo" &&
+          $"nrMesLiquidacao"     === $"nrMesConsumo" &&
+          pr.col("idEntidade")   === qs.col("idEntidade") &&
+          $"dsTipoObjetoDespesa" === $"dsTipoObjetoDespesaNrSeq"
+      )
+      .withColumn("vlMensalDespesa", $"vlMedioLiquidacao" * $"nrQuantidadeConsumoVeiculoMensal")
       .join(ibge, "cdIBGE")
       .withColumn("porArea", $"vlMensalDespesa" / $"area")
       .withColumn("porHabitante", $"vlMensalDespesa" / $"populacao")

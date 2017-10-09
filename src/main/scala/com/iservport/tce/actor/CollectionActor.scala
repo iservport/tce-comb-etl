@@ -1,14 +1,9 @@
 package com.iservport.tce.actor
 
 import akka.actor.{Actor, ActorLogging}
-import com.typesafe.config.ConfigFactory
-import reactivemongo.api.collections.bson.BSONCollection
-import reactivemongo.api.{MongoConnection, MongoDriver}
-
-import scala.concurrent.Future
 
 /**
-  * Created by mauriciofernandesdecastro on 29/05/17.
+  * Atualiza a base de dados.
   */
 class CollectionActor extends Actor with ActorLogging {
 
@@ -16,20 +11,19 @@ class CollectionActor extends Actor with ActorLogging {
 
   import com.iservport.tce.ApplicationConfig._
 
-  val cityColl    = fromConnection("cityData")
-  val entityColl  = fromConnection("entityData")
-  val vehicleColl = fromConnection("vehicle")
-  val usageColl   = fromConnection("usage")
-  val quantityColl   = fromConnection("quantity")
-//  val vehicleDataColl   = db.getCollection("vehicleData")
+  val cityColl     = fromConnection("cityData")
+  val entityColl   = fromConnection("entityData")
+  val vehicleColl  = fromConnection("vehicle")
+  val quantityColl = fromConnection("quantity")
+  val priceColl    = fromConnection("price")
 
   override def receive: Receive = {
     case d: CityData    => cityColl.flatMap(_.insert(d.doc))
     case d: CityGeo     => cityColl.flatMap(_.insert(d.doc))
     case d: EntityData  => entityColl.flatMap(_.insert(d.doc))
     case d: Vehicle     => vehicleColl.flatMap(_.insert(d.doc))
-    case d: Usage       => usageColl.flatMap(_.insert(d.doc))
     case d: Quantity    => quantityColl.flatMap(_.insert(d.doc))
+    case d: Price       => priceColl.flatMap(_.insert(d.doc))
   }
 
 }

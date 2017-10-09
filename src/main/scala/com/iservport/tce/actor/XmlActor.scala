@@ -1,9 +1,9 @@
 package com.iservport.tce.actor
 
-import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import akka.actor.{Actor, ActorLogging, Props}
 import akka.stream.ActorMaterializer
-import akka.stream.alpakka.xml.{ParseEvent, StartElement}
 import akka.stream.alpakka.xml.scaladsl.XmlParsing
+import akka.stream.alpakka.xml.{ParseEvent, StartElement}
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import akka.util.ByteString
 
@@ -28,6 +28,6 @@ class XmlActor extends Actor with ActorLogging {
   val parse = Flow[String].map(ByteString(_)).via(XmlParsing.parser).toMat(Sink.seq)(Keep.right)
 
   def valid(elementName: String) =
-    Array("Combustivel", "QuantitativaCombustivel").contains(elementName)
+    Array("Combustivel", "QuantitativaCombustivel", "QuantidadeConsumoCombustivelVeiculoEq").contains(elementName)
 
 }

@@ -3,7 +3,7 @@ organization := "com.iservport"
 
 name := "tce-comb-etl"
 
-version := "0.1.DEV"
+version := "0.2.DEV"
 
 scalaVersion := "2.11.8"
 

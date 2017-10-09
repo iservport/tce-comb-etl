@@ -3,7 +3,7 @@ package com.iservport.tce.actor
 import akka.actor.{Actor, ActorLogging, Props}
 
 /**
-  * Adapta o domínio do TCE ao domínio da aplicação
+  * Adapta o domínio do TCE ao domínio da aplicação.
   */
 class AdapterActor extends Actor with ActorLogging {
 
@@ -14,11 +14,10 @@ class AdapterActor extends Actor with ActorLogging {
       collectionActor ! CityData(attributes)
       collectionActor ! EntityData(attributes)
       collectionActor ! Vehicle(attributes)
-      collectionActor ! Usage(attributes)
-    case ("QuantitativaCombustivel", attributes: Map[String, String]) =>
+    case ("QuantidadeConsumoCombustivelVeiculoEq", attributes: Map[String, String]) =>
       collectionActor ! Quantity(attributes)
-//    case ("VeiculoEquipamento", attributes: Map[String, String]) =>
-//      collectionActor ! VehicleData(attributes)
+    case ("QuantitativaCombustivel", attributes: Map[String, String]) =>
+      collectionActor ! Price(attributes)
     case other => println(other)
   }
 
