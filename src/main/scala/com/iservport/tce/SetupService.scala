@@ -30,7 +30,10 @@ object SetupService {
 
     val pr = price
       .groupBy($"nrAnoLiquidacao", $"nrMesLiquidacao", $"idEntidade", $"dsTipoObjetoDespesa")
-      .agg(avg("vlUnitarioLiquidacao") as "vlMedioLiquidacao")
+      .agg(
+        first("nmMunicipio") as "nmMunicipio"
+        , avg("vlUnitarioLiquidacao") as "vlMedioLiquidacao"
+      )
       .persist
     val qs = quantity
       .groupBy($"nrAnoConsumo", $"nrMesConsumo", $"idEntidade", $"dsTipoObjetoDespesaNrSeq")
@@ -47,8 +50,10 @@ object SetupService {
           $"nrAnoLiquidacao"     === $"nrAnoConsumo" &&
           $"nrMesLiquidacao"     === $"nrMesConsumo" &&
           pr.col("idEntidade")   === qs.col("idEntidade") &&
-          $"dsTipoObjetoDespesa" === $"dsTipoObjetoDespesaNrSeq"
+          $"dsTipoObjetoDespesa" === $"dsTipoObjetoDespesaNrSeq",
+        "left_outer"
       )
+      .withColumn("nmMunicipio", $"nmMunicipio")
       .withColumn("vlMensalDespesa", $"vlMedioLiquidacao" * $"nrQuantidadeConsumoVeiculoMensal")
       .join(ibge, "cdIBGE")
       .withColumn("porArea", $"vlMensalDespesa" / $"area")

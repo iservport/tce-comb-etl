@@ -64,6 +64,7 @@ case class Vehicle(attributes: Map[String, String]) extends AdapterProtocol {
 //    ,"ultimoEnvioSIMAMNesteExercicio" -> s"${attributes.getOrElse("ultimoEnvioSIMAMNesteExercicio", "YYYY")}"
 //  )
 //}
+// Qunatitativa combustível
 case class Price(attributes: Map[String, String]) extends AdapterProtocol {
   val dtLiquidacao = s"${attributes.getOrElse("dtLiquidacao", "0").stripSuffix("T00:00:00")}"
   val dsTipoObjetoDespesa = s"${attributes.getOrElse("dsTipoObjetoDespesa", "VAZIO")}"
@@ -76,9 +77,10 @@ case class Price(attributes: Map[String, String]) extends AdapterProtocol {
   val doc = BSONDocument(
     "_id" -> s"$id"
     ,"cdIBGE" -> s"${attributes.getOrElse("cdIBGE", "SemCdIBGE")}"
+    ,"nmMunicipio" -> s"${attributes.getOrElse("nmMunicipio", "SemNmMunicipio")}"
     ,"idEntidade" -> idEntidade
-    ,"nrAnoLiquidacao" -> s"${attributes.getOrElse("nrAnoLiquidacao", "")}"
-    ,"nrMesLiquidacao" -> s"${toMonth(dtLiquidacao)}"
+    ,"nrAnoLiquidacao" -> s"${attributes.getOrElse("nrAnoLiquidacao", "0")}".toInt
+    ,"nrMesLiquidacao" -> s"${toMonth(dtLiquidacao)}".toInt
     ,"dtLiquidacao" -> dtLiquidacao
     ,"dsTipoObjetoDespesa" -> dsTipoObjetoDespesa
     ,"vlLiquidacao" -> vlLiquidacao
@@ -88,8 +90,8 @@ case class Price(attributes: Map[String, String]) extends AdapterProtocol {
 }
 
 case class Quantity(attributes: Map[String, String]) extends AdapterProtocol {
-  val nrAnoConsumo = s"${attributes.getOrElse("nrAnoConsumo", "")}"
-  val nrMesConsumo = s"${attributes.getOrElse("nrMesConsumo", "")}"
+  val nrAnoConsumo = s"${attributes.getOrElse("nrAnoConsumo", "0")}".toInt
+  val nrMesConsumo = s"${attributes.getOrElse("nrMesConsumo", "0")}".toInt
   val idEntidade = s"${attributes.getOrElse("idEntidade", "SemIdEntidade")}"
   val idVeiculoEquipamento = s"${attributes.getOrElse("idVeiculoEquipamento", "")}"
   val dsTipoObjetoDespesaNrSeq = s"${attributes.getOrElse("dsTipoObjetoDespesaNrSeq", "VAZIO")}"
