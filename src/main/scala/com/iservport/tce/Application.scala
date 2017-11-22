@@ -12,6 +12,8 @@ import scala.concurrent.duration._
 
 /**
   * Aplicativo para ETL do InovaTCE/Uso Veicular
+  *
+  * @author mauriciofernandesdecastro
   */
 object Application extends App {
 
