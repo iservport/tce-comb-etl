@@ -29,7 +29,7 @@ object Application extends App {
 
   // utiliza Apache Spark e Akka para descompactar, ler os arquivos selecionados e persistir.
 
-  session.sparkContext.binaryFiles("/Users/mauriciofernandesdecastro/Desktop/2016/*Combustivel.zip")
+  session.sparkContext.binaryFiles("/Users/mauriciofernandesdecastro/Desktop/2017_PIT_TodosArquivos/*Combustivel.zip")
     .flatMap { case (zipFilePath, zipContent) =>
       val zipInputStream = new ZipInputStream(zipContent.open())
       Stream.continually(zipInputStream.getNextEntry)
